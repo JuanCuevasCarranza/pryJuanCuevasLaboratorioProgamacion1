@@ -1,0 +1,46 @@
+GUÍA DEL ESTUDIANTE
+Proyecto: Diseño e implementación de un Agente de IA para Gestión Inmobiliaria y Control de Cobranzas
+En esta actividad vas a diseñar, implementar y probar un agente de Inteligencia Artificial capaz de resolver un problema real de administración inmobiliaria. No necesitás conocimientos avanzados de programación: la propuesta está pensada para trabajar con herramientas gratuitas o plataformas no-code / low-code (o mediante código opcional en Python).
+1. ¿Qué vamos a hacer?
+Vas a crear un Agente Inmobiliario de Cobranzas que tenga un objetivo definido, instrucciones, reglas y un comportamiento adaptado a las necesidades de la administración de alquileres. El agente deberá procesar comprobantes de pago de servicios e impuestos de diferentes formatos (PDFs, imágenes de WhatsApp, transferencias bancarias), clasificar los montos y organizarlos para su carga en un sistema de control (Excel).
+Importante: Utilizar un chatbot para hacer una consulta aislada (ej. "extrae el monto de esta imagen") NO alcanza para cumplir la actividad. El objetivo es diseñar el comportamiento integral del agente.
+2. Contexto del Problema Real
+Una administración inmobiliaria gestiona múltiples propiedades (Chacabuco, Urquiza, Rondeau, etc.). Cada mes recibe de los inquilinos una variedad de comprobantes de pago de servicios e impuestos: imágenes de tickets de Banco Macro, capturas de transferencias de Mercado Pago y facturas digitales en PDF. Actualmente, la clasificación y carga de cada monto en la planilla de control (Libro Alquileres.xlsx) se realiza de forma manual, lo que insume tiempo y genera errores.
+3. Paso 1: Ficha de Diseño del Agente
+Deberán completar la siguiente ficha conceptual de diseño antes de iniciar la configuración:
+Elemento	Qué tenés que definir en este proyecto
+ 
+Nombre del Agente	Nombre identificatorio del agente (ej. InmoBot Cobranzas, Asistente de Liquidaciones).
+Objetivo	Procesar comprobantes mensuales de distintos formatos (PDF, JPEG, PNG), extraer montos exactos y clasificar los datos por concepto y propiedad.
+Usuario Destinatario	Administrador de propiedades / Gestor inmobiliario.
+Funcionalidades	1. Identificar la propiedad y el mes del comprobante.
+2. Clasificar el tipo de servicio (Luz, Agua, Gas, Expensas, Municipalidad, Alquiler).
+3. Extraer el monto exacto en pesos.
+4. Mapear cada concepto con su fila equivalente en la planilla de control.
+Información de entrada	Archivos de comprobantes (PDF, imágenes de transferencias o tickets) y el listado de conceptos de la planilla Excel.
+Reglas	- No inventar ni asumir montos si la imagen no es legible.
+- Distinguir entre la factura global emitida y los comprobantes individuales de pago de servicios.
+- Mantener el formato numérico correcto (respetar decimales y centavos).
+Comportamiento	Debe ser preciso, analítico, solicitar aclaraciones cuando falten datos clave y emitir alertas ante discrepancias de propiedad o montos no legibles.
+Limitaciones	Reconocer cuando un comprobante no pertenece a la propiedad o cuando la calidad del archivo impide leer el monto con certeza.
+4. Paso 2: Crear las Instrucciones (Prompt del Sistema / Reglas)
+Tus instrucciones deben dejar claro cómo debe actuar el agente ante cada documento que recibe. Pueden guiarse con la siguiente estructura básica de prompt:
+Eres el Agente Inmobiliario de Cobranzas. Tu objetivo es procesar comprobantes de pago de servicios e impuestos recibidos en formato de imagen o PDF.
+
+Para cada archivo debes:
+1. Detectar el servicio o concepto abonado (ej: Expensas, Agua, Luz, Gas, Muni, Alquiler).
+2. Identificar el monto total pagado en pesos.
+3. Relacionar el concepto con el nombre de fila correspondiente en la planilla (ej: "expensas chacab.", "luz chacabuco").
+4. Si la imagen es difusa, incompleta o no corresponde a un comprobante de la propiedad, debes emitir una alerta y NO inventar datos.
+5. Paso 3: Probar el Agente (Mínimo 5 Pruebas)
+Deberán someter al agente a 5 pruebas concretas usando documentos reales/ficticios y registrar los resultados:
+N°	Tipo de Prueba	Entrada del Usuario (Comprobante / Caso)	Respuesta Obtenida	¿Funcionó?	¿Qué mejorarías?
+ 
+1	Situación normal A	Ticket de Homebanking claro (ej. Gas Chacabuco - $9.535,67).			
+2	Situación normal B	Factura PDF con múltiples conceptos (Alquiler, Expensas, Servicios).			
+3	Situación inesperada	Comprobante de transferencia de Mercado Pago con leyenda "Motivo: Varios".			
+4	Información incompleta	Imagen cortada donde se ve el servicio pero no el monto final.			
+5	Fuera de alcance	Comprobante de otra propiedad (ej. Luz Urquiza enviado a la carpeta Chacabuco) o un ticket de supermercado.			
+6. Paso 4: Mejorar el Agente
+Después de realizar las pruebas, identifiquen al menos un fallo o comportamiento no deseado (ejemplo: el agente asumió un concepto en la prueba 3 sin preguntar). Modifiquen las instrucciones o reglas del agente y vuelvan a probarlo. En la entrega deberán explicar qué cambió y por qué.
+

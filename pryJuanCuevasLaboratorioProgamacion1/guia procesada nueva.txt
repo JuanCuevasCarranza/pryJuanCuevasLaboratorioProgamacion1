@@ -1,0 +1,244 @@
+
+LABORATORIO DE PROGRAMACIÓN I
+Guía práctica paso a paso
+Gimnasio Siglo — Inscripción de socios
+SP2 y SP3 · Variables, tipos de datos, if, if anidado, if en un renglón, operador ternario y switch
+Cómo usar esta guía
+Esta guía no trae código fuente. Cada paso te dice qué tiene que hacer el programa y con qué herramienta del lenguaje conviene resolverlo; el cómo lo escribís vos, apoyándote en el texto de estudio.
+Antes de cada bloque de programación vas a encontrar un recuadro azul con preguntas. Respondelas en tu carpeta antes de escribir: si no las podés responder, volvé al capítulo indicado.
+Al final hay una tabla de casos de prueba con los resultados esperados. Tu programa está terminado cuando todos coinciden.
+ 
+El problema a resolver
+El gimnasio Siglo necesita una aplicación de escritorio para calcular el costo de inscripción de un socio. El recepcionista carga los datos de la persona, elige el plan, el turno, la cantidad de meses, los adicionales y la forma de pago, y la aplicación muestra el detalle del costo final.
+Reglas del negocio
+Concepto	Regla
+Planes (precio mensual)	Musculación $ 15.000 · Funcional $ 18.000 · Natación $ 22.000
+Turnos	Mañana (7 a 12 h) · Tarde (14 a 18 h) · Noche (18 a 23 h). Solo informativo, no cambia el precio.
+Meses	Entre 1 y 12. Fuera de ese rango no se calcula.
+Edad mínima	14 años. Si es menor, se informa que no puede inscribirse y no se calcula.
+Casillero (adicional)	$ 3.000 por mes, se suma al precio mensual si está marcado.
+Descuento por edad / estudiante	Menor de 18: 25%. Si no es menor: 65 años o más: 30%; si no, estudiante: 15%; si no, sin descuento. Nunca se acumulan.
+Forma de pago	Efectivo: 10% de descuento. Tarjeta: 1 cuota sin recargo, 3 cuotas +10%, 6 cuotas +20%.
+Orden del cálculo	1) Subtotal = (plan + casillero) × meses → 2) se aplica el descuento por edad/estudiante → 3) se aplica el descuento o recargo de la forma de pago.
+
+
+Comportamiento esperado de la interfaz
+•	Al abrir: plan Musculación, turno Mañana, meses en 1, casillas sin marcar, Efectivo seleccionado, combo de cuotas deshabilitado, botón Calcular deshabilitado.
+•	El combo de cuotas se habilita (con 1 cuota seleccionada) solo cuando se elige Tarjeta; al volver a Efectivo se deshabilita y queda sin selección.
+•	El botón Calcular se habilita solo si hay nombre, edad y meses cargados. Si falta alguno, se deshabilita.
+•	En Edad y Meses solo se pueden escribir dígitos y la tecla de borrar. El nombre se escribe siempre en mayúsculas.
+•	Al calcular se muestra el detalle en un cuadro de diálogo y el formulario vuelve a su estado inicial.
+📖 Texto de estudio: SP2, Situación profesional “La lógica en la programación” (pág. 89): este problema es primo hermano de la reserva de cabañas. Leé cómo está planteada y compará.
+ 
+Qué vas a practicar y dónde
+Cada tema del Kahoot aparece aplicado en una etapa concreta del proyecto:
+Tema	Dónde se aplica	Etapa
+Creación de variables y constantes	Precios, recargos, datos ingresados, acumuladores del cálculo	4 y 7
+Tipos de datos	Elegir tipo para cada dato (dinero, edad, casillas, textos, tecla presionada)	4
+if / if-else y operadores lógicos	Habilitar Calcular, validar rangos, forma de pago	5 y 8
+if anidado	Descuento por edad / estudiante	7
+if en un renglón	Sumar el casillero al precio mensual	7
+Operador ternario	Categoría del socio y texto de la forma de pago	9
+switch (string e int)	Precio según plan y horario según turno	6
+Conversión y validación (SP3)	Parse de TextBox, filtrado de teclas con KeyPress	5
+struct (SP3)	Agrupar los datos del socio en una sola variable	10
+
+ 
+Etapa 1 · Crear el proyecto
+1	Crear el proyecto Windows Forms
+Abrí Visual Studio → Crear un nuevo proyecto → Aplicación de Windows Forms (C#). Nombralo pryApellidoGimnasio y elegí una carpeta propia.
+
+2	Renombrar el formulario
+En el Explorador de soluciones renombrá Form1 a frmInscripcion. Aceptá cuando Visual Studio pregunte si querés cambiar también las referencias.
+En Propiedades (F4): Text = Gimnasio Siglo — Inscripción, StartPosition = CenterScreen, FormBorderStyle = FixedSingle, MaximizeBox = False.
+
+3	Primera verificación
+Ejecutá con F5. Debe abrirse la ventana vacía, centrada y sin poder maximizarse. Si compila, recién ahí seguí.
+
+📖 Texto de estudio: SP1 / H3 Visual Studio (pág. 52) y SP2 / H1 Diseño de formularios (pág. 91).
+Etapa 2 · Diseñar la interfaz
+Armá el formulario con estos controles. Agrupá lo relacionado en GroupBox (Datos personales, Plan, Forma de pago). Respetá los nombres: los vas a usar en todo el proyecto.
+Control	Name	Text / contenido	Propiedades a configurar
+TextBox	txtNombre	—	MaxLength = 30
+TextBox	txtEdad	—	MaxLength = 3
+CheckBox	chkEstudiante	Estudiante	Checked = False
+ComboBox	cboPlan	Musculación / Funcional / Natación	DropDownStyle = DropDownList
+ComboBox	cboTurno	Mañana / Tarde / Noche	DropDownStyle = DropDownList
+TextBox	txtMeses	—	MaxLength = 2
+CheckBox	chkCasillero	Casillero ($ 3.000/mes)	Checked = False
+RadioButton	rbtEfectivo	Efectivo	Dentro del GroupBox de pago
+RadioButton	rbtTarjeta	Tarjeta	Mismo GroupBox que rbtEfectivo
+ComboBox	cboCuotas	1 / 3 / 6	DropDownList
+Button	btnCalcular	&Calcular	—
+Button	btnLimpiar	&Limpiar	—
+Label (varios)	lbl…	Rótulos de cada campo	Usá el prefijo lbl en todos
+
+⚠ Atención
+Los dos RadioButton tienen que estar dentro del mismo GroupBox. Si quedan en contenedores distintos, se pueden marcar los dos a la vez y la lógica de pago deja de funcionar.
+
+4	Ordenar la tabulación
+Menú Ver → Orden de tabulación y hacé clic en los controles en el orden en que se cargan los datos: nombre, edad, estudiante, plan, turno, meses, casillero, pago, cuotas, Calcular.
+
+5	Botón por defecto
+En las propiedades del formulario asigná AcceptButton = btnCalcular, para que Enter dispare el cálculo.
+
+📖 Texto de estudio: SP2 / H2 Controles (pág. 102): TextBox, CheckBox, RadioButton, ComboBox, GroupBox y propiedades Name, Text, Enabled.
+ 
+Etapa 3 · Estado inicial del formulario
+El formulario tiene que arrancar siempre igual y volver a ese mismo estado después de cada cálculo. Por eso conviene escribir esa lógica una sola vez.
+6	Crear un método propio para el estado inicial
+Creá un método (por ejemplo EstadoInicial) que deje todos los controles como indica el enunciado: textos vacíos, meses en 1, casillas desmarcadas, primer plan y primer turno seleccionados, Efectivo marcado, cboCuotas sin selección y deshabilitado, btnCalcular deshabilitado.
+Terminá dejando el foco en txtNombre.
+
+7	Llamarlo desde el evento Load y desde Limpiar
+Invocá ese método en el evento Load del formulario y en el Click de btnLimpiar.
+
+? Para pensar antes de programar
+¿Qué propiedad de un ComboBox indica qué elemento está seleccionado, y qué valor tiene que tomar para que no haya ninguno?
+¿Por qué es mejor un método reutilizable que copiar las mismas líneas en Load y en Limpiar?
+
+📖 Texto de estudio: SP2 / H1 (pág. 91): eventos del formulario y estado inicial de la interfaz.
+Etapa 4 · Constantes, variables y tipos de datos
+Antes de escribir cualquier cálculo, decidí qué datos maneja el programa, de qué tipo es cada uno y si su valor cambia o no durante la ejecución.
+8	Completar la tabla de diseño de datos
+Copiá esta tabla en tu carpeta y completá las celdas vacías. La columna ¿Por qué? es la más importante.
+
+Dato	¿Constante o variable?	Tipo	¿Por qué?
+Precio mensual de Natación	Constante		
+Precio del casillero por mes		decimal	
+Edad mínima para inscribirse			
+Porcentaje de recargo en 6 cuotas	Constante		
+Nombre ingresado	Variable		
+Edad ingresada		int	
+Cantidad de meses			
+¿Es estudiante?	Variable		
+Tecla presionada en un TextBox			
+Subtotal, descuento y total			
+
+9	Declarar las constantes
+Declará las constantes a nivel de la clase del formulario (fuera de los eventos), con nombres en MAYÚSCULAS, por ejemplo PRECIO_NATACION o EDAD_MINIMA. Así cualquier evento las puede usar y, si cambia un precio, se modifica en un solo lugar.
+
+10	Declarar las variables del cálculo
+Dentro del evento Click de btnCalcular declará e inicializá las variables que vas a necesitar (nombre, edad, meses, precio mensual, subtotal, porcentaje de descuento, porcentaje de ajuste por pago, total y valor de cuota). Respetá camel case: precioMensual, valorCuota.
+
+⚠ Atención
+Para dinero usá decimal. Si elegís float, recordá que los literales con decimales necesitan sufijo (f para float, m para decimal); sin él, el proyecto no compila.
+
+? Para pensar antes de programar
+¿Qué pasaría si declarás una constante y más adelante intentás asignarle otro valor?
+¿Por qué la edad no debería ser de tipo string aunque venga de un TextBox?
+¿Cuál es la diferencia entre declarar una variable y declararla con un valor inicial?
+
+📖 Texto de estudio: SP2 / H3 Identificadores, constantes, variables, tipos de datos y operadores (págs. 148–154), en especial la tabla de tipos de la pág. 151.
+ 
+Etapa 5 · Validar el ingreso de datos
+5.a Filtrar teclas
+11	Solo dígitos en Edad y Meses
+Programá el evento KeyPress de txtEdad para que descarte cualquier tecla que no sea un dígito, salvo la tecla de borrar (Backspace).
+Usá la estructura Char para preguntar si es dígito y la enumeración Keys para identificar Backspace. Una tecla se descarta marcando el evento como manejado.
+Hacé lo mismo en txtMeses. Tip: podés asociar el mismo método KeyPress a los dos TextBox desde la ventana Propiedades → Eventos.
+
+
+12	Nombre siempre en mayúsculas
+En el KeyPress de txtNombre, si la tecla es una letra minúscula, reemplazala por su mayúscula antes de que llegue al TextBox.
+
+5.b Habilitar el botón Calcular
+13	Condición compuesta
+En el evento TextChanged de txtNombre, txtEdad y txtMeses (pueden compartir un único método) evaluá con un if-else: si los tres tienen contenido, habilitá btnCalcular; si no, deshabilitalo.
+Pensá qué operador lógico necesitás para exigir que se cumplan las tres condiciones a la vez.
+
+5.c Validar rangos al calcular
+14	Convertir y controlar
+Al comienzo del Click de btnCalcular convertí el texto de edad y meses a número con el método Parse del tipo que elegiste.
+Si la edad es menor que la constante de edad mínima, mostrá un mensaje y cortá el cálculo.
+Si los meses están fuera del rango 1 a 12, mostrá otro mensaje y cortá el cálculo. Resolvé el rango con una sola condición usando un operador lógico.
+
+⚠ Atención
+El orden importa: primero convertir, después validar, y recién después calcular. Si convertís un TextBox vacío, el programa se detiene con una excepción; por eso el botón solo se habilita cuando hay datos.
+
+? Para pensar antes de programar
+Para “meses fuera de rango”, ¿usás && o ||? Probá mentalmente con 0, 5 y 15.
+¿Qué evento se ejecuta primero cuando se presiona una tecla: KeyDown, KeyPress o KeyUp?
+
+📖 Texto de estudio: SP3 / H4 Elementos del lenguaje para conversiones y validaciones de datos (págs. 217–221): KeyPress, Char.IsDigit, Char.IsLower, Char.ToUpper, Keys.Back, Parse.
+ 
+Etapa 6 · switch: plan y turno
+15	Precio según el plan (switch con string)
+Guardá en una variable string el plan elegido en cboPlan.
+Con un switch sobre esa variable asigná a precioMensual la constante que corresponde a cada plan. Agregá un default que informe un plan inválido.
+Cada case termina con su break, incluido el default.
+
+16	Horario según el turno (switch con int)
+Usá la posición seleccionada en cboTurno (un número entero que empieza en 0) como expresión de un segundo switch.
+Cada case asigna a una variable string el horario del turno según la tabla del enunciado. Este dato se muestra en el resumen final.
+
+? Para pensar antes de programar
+¿Por qué en los case tenés que usar valores constantes y no variables?
+El precio podría resolverse con if anidados. ¿Qué ventaja de legibilidad tiene el switch acá?
+Según el material, ¿con qué tipos de expresión se puede usar switch? ¿Qué harías si el dato fuera float?
+
+📖 Texto de estudio: SP2 / H4 Estructuras de control, estructura switch y comparación con if anidado (págs. 160–162).
+Etapa 7 · Subtotal, casillero y descuento por edad
+17	Casillero: if en un solo renglón
+Si chkCasillero está marcado, sumá la constante del casillero a precioMensual. Escribilo como un if de una sola instrucción, en un solo renglón y sin llaves.
+Después calculá el subtotal: precio mensual por cantidad de meses.
+
+⚠ Atención
+Un if sin llaves controla solo la instrucción siguiente. Si más adelante necesitás hacer dos cosas cuando se cumple la condición, tenés que agregar las llaves.
+
+18	Descuento por edad o estudiante: if anidado
+Armá un if-else que pregunte primero si es menor de 18 (25%).
+Dentro del else, anidá otro if-else: 65 años o más (30%); si no, un tercer nivel que pregunte si chkEstudiante está marcado (15%) o no (0%).
+Guardá el porcentaje en una variable y aplicalo al subtotal.
+
+? Para pensar antes de programar
+Un socio de 16 años que además es estudiante, ¿qué descuento recibe? ¿Por qué el orden de las preguntas lo resuelve?
+¿Cómo calculás un porcentaje de descuento usando operadores aritméticos, sin funciones especiales?
+Dibujá el diagrama de decisiones del descuento antes de escribirlo.
+
+📖 Texto de estudio: SP2 / H4 (págs. 159–162): if, if-else e if anidado. SP2 / H3 (pág. 152): operadores aritméticos y de comparación.
+Etapa 8 · Forma de pago
+19	Habilitar y deshabilitar cuotas
+En el evento CheckedChanged de rbtTarjeta: si está marcado, habilitá cboCuotas y seleccioná 1 cuota; si no, deshabilitalo y dejalo sin selección. Resolvelo con un if-else.
+
+20	Descuento o recargo
+En el Click de Calcular, con un if-else preguntá si el pago es en efectivo: el ajuste es de −10%.
+En el else (tarjeta), convertí la cantidad de cuotas elegida a entero y con una cadena de if - else if asigná el recargo: 1 cuota 0%, 3 cuotas 10%, 6 cuotas 20%.
+Aplicá el ajuste al importe que ya tiene el descuento por edad para obtener el total.
+
+? Para pensar antes de programar
+Este paso también se podría resolver con switch sobre las cuotas. ¿Cuál elegirías y por qué?
+Si el pago es en efectivo, ¿tiene sentido leer el combo de cuotas? ¿Qué pasaría si lo convertís estando vacío?
+
+📖 Texto de estudio: SP2 / H2 (pág. 102): RadioButton y evento CheckedChanged. SP2 / H4 (pág. 160): estructura if-else.
+Etapa 9 · Operador ternario
+21	Categoría del socio
+Con el operador ternario asigná a una variable string el texto “Menor” o “Mayor” según la edad, en una sola asignación.
+
+22	Texto de forma de pago y valor de cuota
+Con otro ternario armá el texto de pago: “Efectivo” o “Tarjeta en N cuotas”.
+Con un tercer ternario calculá el valor de cada cuota: si es efectivo, el total; si es tarjeta, el total dividido por la cantidad de cuotas.
+
+? Para pensar antes de programar
+El ternario devuelve un valor. ¿Qué tiene que coincidir entre el valor para verdadero, el valor para falso y la variable donde lo guardás?
+¿Cuándo conviene un ternario y cuándo un if-else completo?
+
+⚠ Atención
+El ternario no figura desarrollado en el texto de estudio. Su forma general es: condición, signo de pregunta, valor si es verdadera, dos puntos, valor si es falsa. Investigalo en la documentación oficial de C#.
+
+ 
+Etapa 10 · Agrupar en un struct y mostrar el resultado
+23	Declarar el struct SOCIO
+A nivel de la clase del formulario declará un struct SOCIO con campos públicos para: nombre, edad, categoría, plan, horario, meses, forma de pago, total y valor de cuota. Elegí el tipo de cada campo según la tabla de la Etapa 4.
+Recordá que en la declaración del struct no se asignan valores iniciales a los campos.
+
+24	Cargar y mostrar
+  
+Mostralo con MessageBox con título e ícono de información. Formateá los importes como moneda.
+Por último, llamá al método EstadoInicial.
+
+? Para pensar antes de programar
+¿Qué ventaja tiene guardar todo en una variable SOCIO en lugar de nueve variables sueltas? Pensá en la SP3, cuando haya que guardar varios socios.
+
+📖 Texto de estudio: SP3 / H1 Tipos de datos definidos por el usuario, tipos struct (págs. 194–197). SP2 / H3 (pág. 154): operador + para concatenar y operador punto.
+ 
