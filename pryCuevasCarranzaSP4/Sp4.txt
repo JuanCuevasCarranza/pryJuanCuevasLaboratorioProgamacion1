@@ -1,0 +1,26 @@
+Bar La Milanga
+El encargado de un negocio gastronómico le ha solicitado a usted en calidad de
+pasante, desarrolle un programa que permita ingresar las ventas diarias de cada mozo
+que atiende en el negocio para luego poder realizar cálculos que generen distinto tipos
+de información.
+Las ventas se discriminan en 4 categorías: Comidas, Bebidas sin alcohol, Bebidas con
+alcohol y Postres.
+Los mozos son 5: Julio, Esteban, Javier, Gonzalo y Alberto.
+La interfaz debe contar con una grilla configurada con 5 filas, una para cada mozo y 4
+columnas para las categorías de venta. El usuario deberá cargar los importes finales de
+cada mozo en cada una de las categorías directamente sobre las celdas de la grilla.
+Una vez cargada la totalidad de la grilla y con un botón denominado 'Validar Datos' se
+deberá verificar que todas las celdas tengan un valor numérico, admitiendo como
+válido el valor cero. Si se detecta algún error se debe mostrar un mensaje de error y se
+deshabilitarán los botones de las consultas.
+Los botones de las consultas se ubican en la parte inferior del formulario y son dos, el
+primero denominado "Mozo del día" deberá determinar qué mozo tiene el mayor
+importe de venta total, considerando todas las categorías y mostrará su nombre e
+importe en controles de tipo 'TextBox' o 'Label' ubicados a la derecha del botón.
+El segundo botón de consulta "Totales" deberá calcular el importe total vendido por
+todos los mozos y los totales por categoría, son 5 valores que se mostrarán también a la
+derecha del botón. Como en el caso anterior, pueden colocarse controles 'TextBox' o
+'Label' para mostrar los resultados.
+El formulario tendrá también un botón para cerrar la aplicación.
+Usar un arreglo bidimensional de tipo float para almacenar los importes ingresados en
+la grilla.
